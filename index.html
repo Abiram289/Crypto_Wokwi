@@ -29,7 +29,7 @@
 
 <main>
 
-  <!-- Top cards -->
+  <!-- Top cards: removed Transfer Time, added insight card -->
   <section class="top-cards">
     <div class="card sensor-card">
       <div class="card-label">🌡 Live Sensor</div>
@@ -44,41 +44,53 @@
       <div class="sub-val" id="liveEncTime"></div>
     </div>
     <div class="card">
-      <div class="card-label">⚡ Fastest Architecture</div>
-      <div class="big-val green" style="font-size:1.5rem" id="fastestName">---</div>
+      <div class="card-label">⚡ Fastest (ESP32 SW)</div>
+      <div class="big-val cyan" style="font-size:1.5rem" id="fastestName">---</div>
       <div class="sub-val" id="fastestTime"></div>
     </div>
     <div class="card">
-      <div class="card-label">🏆 PRIDE-64 vs PRESENT-64</div>
-      <div class="big-val" id="relWinner" style="font-size:1.2rem">---</div>
-      <div class="sub-val">Enc speedup: <strong id="relSpeedup">--</strong></div>
+      <div class="card-label">🏆 FPGA Winner</div>
+      <div class="big-val green" style="font-size:1.4rem">PRIDE-64</div>
+      <div class="sub-val">1165.48 Mbps on Virtex-5</div>
+      <div class="sub-val" style="color:#ffd740;margin-top:4px">18.7% faster than PRESENT</div>
     </div>
   </section>
 
-  <!-- Relative Performance Metrics -->
+  <!-- Insight banner -->
+  <section class="insight-banner">
+    <div class="insight-box">
+      <span class="insight-icon">💡</span>
+      <span><strong>Why PRESENT is faster in software but PRIDE wins on FPGA:</strong>
+      PRIDE's L0–L3 matrix linear layer uses 16×16 binary matrix operations that require more CPU cycles in software.
+      On FPGA, these operations are parallelised in dedicated logic gates, cutting PRIDE to just 21 cycles vs PRESENT's 31.
+      This is precisely the contribution of Dahiphale et al. (2025).</span>
+    </div>
+  </section>
+
+  <!-- Relative Performance -->
   <section class="table-section">
     <div class="card">
       <h2>📐 Relative Performance: A1 PRIDE-64 vs A2 PRESENT-64</h2>
       <div class="rel-grid">
         <div class="rel-box">
           <div class="rel-label">Enc Speedup</div>
-          <div class="rel-val green" id="relSpeedup2">--</div>
-          <div class="rel-desc">PRIDE / PRESENT enc time ratio</div>
+          <div class="rel-val cyan" id="relSpeedup">--</div>
+          <div class="rel-desc">PRESENT enc_time / PRIDE enc_time<br>(>1 = PRIDE faster)</div>
         </div>
         <div class="rel-box">
           <div class="rel-label">Throughput Ratio</div>
-          <div class="rel-val green" id="relThroughput">--</div>
+          <div class="rel-val cyan" id="relThroughput">--</div>
           <div class="rel-desc">PRIDE Mbps / PRESENT Mbps</div>
         </div>
         <div class="rel-box">
           <div class="rel-label">Energy Efficiency</div>
           <div class="rel-val yellow" id="relEnergy">--</div>
-          <div class="rel-desc">PRESENT energy / PRIDE energy</div>
+          <div class="rel-desc">PRESENT energy / PRIDE energy<br>(>1 = PRIDE more efficient)</div>
         </div>
         <div class="rel-box">
           <div class="rel-label">Rounds Advantage</div>
-          <div class="rel-val cyan" id="relRounds">--</div>
-          <div class="rel-desc">31 (PRESENT) / 20 (PRIDE) = 1.55×</div>
+          <div class="rel-val green">1.55×</div>
+          <div class="rel-desc">31 rounds (PRESENT) ÷ 20 (PRIDE)<br>PRIDE needs 35% fewer rounds</div>
         </div>
         <div class="rel-box">
           <div class="rel-label">Clock Cycle Ratio</div>
@@ -86,15 +98,15 @@
           <div class="rel-desc">PRESENT cycles / PRIDE cycles</div>
         </div>
         <div class="rel-box">
-          <div class="rel-label">Key Size</div>
+          <div class="rel-label">Key Size Ratio</div>
           <div class="rel-val yellow">1.6×</div>
-          <div class="rel-desc">PRIDE 128-bit vs PRESENT 80-bit</div>
+          <div class="rel-desc">PRIDE 128-bit vs PRESENT 80-bit<br>Stronger security for PRIDE</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Enc / Dec charts -->
+  <!-- Enc / Dec -->
   <section class="charts-row">
     <div class="card chart-card">
       <h2>Encryption Time (µs) <span class="note">lower = faster</span></h2>
@@ -109,7 +121,7 @@
   <!-- Throughput + Cycles -->
   <section class="charts-row">
     <div class="card chart-card">
-      <h2>Throughput (Mbps) <span class="note">block_bits ÷ enc_time_µs</span></h2>
+      <h2>Throughput (Mbps) <span class="note">block_bits ÷ enc_µs · higher = faster</span></h2>
       <canvas id="thrChart"></canvas>
     </div>
     <div class="card chart-card">
@@ -118,33 +130,34 @@
     </div>
   </section>
 
-  <!-- Energy + Efficiency -->
+  <!-- Energy + Rounds -->
   <section class="charts-row">
     <div class="card chart-card">
       <h2>Energy per Block (nJ) <span class="note">lower = better</span></h2>
       <canvas id="eneChart"></canvas>
     </div>
     <div class="card chart-card">
-      <h2>Efficiency (Mbps per 1K cycles) <span class="note">higher = better</span></h2>
-      <canvas id="effChart"></canvas>
+      <h2>Rounds per Architecture <span class="note">fewer rounds = faster pipeline</span></h2>
+      <canvas id="rndChart"></canvas>
     </div>
   </section>
 
-  <!-- FPGA Comparison -->
+  <!-- FPGA Comparison — fixed to show both SW and HW bars -->
   <section class="charts-row">
     <div class="card chart-card wide">
       <h2>📊 Throughput: ESP32 Software vs FPGA Virtex-5 Hardware</h2>
-      <p class="note-text">FPGA values from Dahiphale et al. (2025). Software values from live ESP32 simulation. FPGA is orders of magnitude faster due to dedicated hardware datapaths.</p>
+      <p class="note-text">FPGA values from Dahiphale et al. (2025). ESP32 software values update live from simulation.
+      The gap illustrates why dedicated hardware matters for IoT cryptography.</p>
       <canvas id="fpgaChart"></canvas>
     </div>
   </section>
 
-  <!-- Metrics Table -->
+  <!-- Complete Metrics Table -->
   <section class="table-section">
     <div class="card">
       <h2>📋 Complete Performance Metrics — All 4 Architectures</h2>
       <div class="table-wrap">
-        <table id="metricsTable">
+        <table>
           <thead>
             <tr>
               <th>Architecture</th><th>Datapath</th><th>Key</th><th>Rounds</th>
@@ -153,7 +166,7 @@
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="10" style="text-align:center;color:#888">Waiting for ESP32 data...</td></tr>
+            <tr><td colspan="10" style="text-align:center;color:#888;padding:20px">Waiting for ESP32 data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -167,7 +180,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Architecture</th><th>Cipher</th><th>Datapath</th><th>Cycles</th><th>Throughput @Fmax</th><th>Total Power</th><th>Energy/block</th></tr>
+            <tr><th>Arch</th><th>Cipher</th><th>Datapath</th><th>Cycles</th><th>Throughput @Fmax</th><th>Total Power</th><th>Energy/block</th></tr>
           </thead>
           <tbody>
             <tr><td style="color:#00e676;font-weight:700">A1</td><td>PRIDE</td><td>64-bit round-based</td><td>21</td><td style="color:#00e676;font-weight:700">1165.48 Mbps</td><td>579.46 mW</td><td>0.897 µJ</td></tr>
@@ -178,7 +191,7 @@
       </div>
       <p class="note-text" style="margin-top:12px">
         PRIDE (A1) achieves <strong style="color:#00e676">18.7% higher throughput</strong> and
-        <strong style="color:#00e676">32.4% lower energy</strong> than PRESENT (A2) on FPGA,
+        <strong style="color:#00e676">32.4% lower energy per block</strong> than PRESENT (A2) on FPGA,
         due to its L0–L3 matrix linear layer enabling only 20 rounds vs PRESENT's 31.
       </p>
     </div>
@@ -192,13 +205,5 @@
 </footer>
 
 <script src="dashboard.js"></script>
-<script>
-  // Wire up relative metrics panel (second instance)
-  const origUpdate = updateRelative;
-  window.updateRelative = function(rel) {
-    origUpdate(rel);
-    document.getElementById('relSpeedup2').textContent = document.getElementById('relSpeedup').textContent;
-  }
-</script>
 </body>
 </html>
