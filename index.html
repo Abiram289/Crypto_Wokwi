@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IoT Cipher Benchmark Dashboard</title>
+<title>IoT Cipher Benchmark — PRIDE vs PRESENT</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +12,13 @@
 <header>
   <div class="header-inner">
     <h1>⚡ IoT Cipher Benchmark Dashboard</h1>
-    <p class="subtitle">PRESENT-80 · PRIDE · AES-128 on ESP32 · Based on Dahiphale et al. (2025)</p>
+    <p class="subtitle">PRIDE vs PRESENT — 4 Architectures on ESP32 · Dahiphale et al. (2025)</p>
+    <div class="legend-row">
+      <span class="leg" style="color:#00e676">■ A1 PRIDE-64</span>
+      <span class="leg" style="color:#00c8ff">■ A2 PRESENT-64</span>
+      <span class="leg" style="color:#6495ed">■ A3 PRESENT-32</span>
+      <span class="leg" style="color:#b4ff64">■ A4 PRIDE-32</span>
+    </div>
     <div class="status-bar">
       <span class="dot" id="statusDot"></span>
       <span id="statusText">Connecting...</span>
@@ -23,7 +29,7 @@
 
 <main>
 
-  <!-- Sensor + Active Cipher -->
+  <!-- Top cards -->
   <section class="top-cards">
     <div class="card sensor-card">
       <div class="card-label">🌡 Live Sensor</div>
@@ -31,25 +37,64 @@
       <div class="big-unit">°C Temperature</div>
       <div class="sub-val" id="humVal">-- %RH</div>
     </div>
-    <div class="card cipher-card">
-      <div class="card-label">🔐 Active Cipher</div>
-      <div class="big-val cipher-name" id="activeCipher">---</div>
-      <div class="sub-val" id="activeCT" style="font-family:monospace;font-size:.8rem;word-break:break-all"></div>
+    <div class="card">
+      <div class="card-label">🔐 Active Architecture</div>
+      <div class="big-val" style="color:#00e676;font-size:1.6rem" id="activeCipher">---</div>
+      <div class="sub-val hex" id="activeCT"></div>
       <div class="sub-val" id="liveEncTime"></div>
     </div>
-    <div class="card stat-card">
-      <div class="card-label">⏱ Fastest Cipher</div>
-      <div class="big-val green" id="fastestName">---</div>
+    <div class="card">
+      <div class="card-label">⚡ Fastest Architecture</div>
+      <div class="big-val green" style="font-size:1.5rem" id="fastestName">---</div>
       <div class="sub-val" id="fastestTime"></div>
     </div>
-    <div class="card stat-card">
-      <div class="card-label">📡 Transfer Time</div>
-      <div class="big-val yellow" id="transferTime">-- ms</div>
-      <div class="sub-val">ESP32 → Server</div>
+    <div class="card">
+      <div class="card-label">🏆 PRIDE-64 vs PRESENT-64</div>
+      <div class="big-val" id="relWinner" style="font-size:1.2rem">---</div>
+      <div class="sub-val">Enc speedup: <strong id="relSpeedup">--</strong></div>
     </div>
   </section>
 
-  <!-- Enc / Dec Time Bar Charts -->
+  <!-- Relative Performance Metrics -->
+  <section class="table-section">
+    <div class="card">
+      <h2>📐 Relative Performance: A1 PRIDE-64 vs A2 PRESENT-64</h2>
+      <div class="rel-grid">
+        <div class="rel-box">
+          <div class="rel-label">Enc Speedup</div>
+          <div class="rel-val green" id="relSpeedup2">--</div>
+          <div class="rel-desc">PRIDE / PRESENT enc time ratio</div>
+        </div>
+        <div class="rel-box">
+          <div class="rel-label">Throughput Ratio</div>
+          <div class="rel-val green" id="relThroughput">--</div>
+          <div class="rel-desc">PRIDE Mbps / PRESENT Mbps</div>
+        </div>
+        <div class="rel-box">
+          <div class="rel-label">Energy Efficiency</div>
+          <div class="rel-val yellow" id="relEnergy">--</div>
+          <div class="rel-desc">PRESENT energy / PRIDE energy</div>
+        </div>
+        <div class="rel-box">
+          <div class="rel-label">Rounds Advantage</div>
+          <div class="rel-val cyan" id="relRounds">--</div>
+          <div class="rel-desc">31 (PRESENT) / 20 (PRIDE) = 1.55×</div>
+        </div>
+        <div class="rel-box">
+          <div class="rel-label">Clock Cycle Ratio</div>
+          <div class="rel-val cyan" id="relCycles">--</div>
+          <div class="rel-desc">PRESENT cycles / PRIDE cycles</div>
+        </div>
+        <div class="rel-box">
+          <div class="rel-label">Key Size</div>
+          <div class="rel-val yellow">1.6×</div>
+          <div class="rel-desc">PRIDE 128-bit vs PRESENT 80-bit</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enc / Dec charts -->
   <section class="charts-row">
     <div class="card chart-card">
       <h2>Encryption Time (µs) <span class="note">lower = faster</span></h2>
@@ -61,10 +106,10 @@
     </div>
   </section>
 
-  <!-- Throughput + Clock Cycles -->
+  <!-- Throughput + Cycles -->
   <section class="charts-row">
     <div class="card chart-card">
-      <h2>Throughput (Mbps) <span class="note">higher = faster</span></h2>
+      <h2>Throughput (Mbps) <span class="note">block_bits ÷ enc_time_µs</span></h2>
       <canvas id="thrChart"></canvas>
     </div>
     <div class="card chart-card">
@@ -73,65 +118,69 @@
     </div>
   </section>
 
-  <!-- Energy + Enc-per-bit -->
+  <!-- Energy + Efficiency -->
   <section class="charts-row">
     <div class="card chart-card">
       <h2>Energy per Block (nJ) <span class="note">lower = better</span></h2>
       <canvas id="eneChart"></canvas>
     </div>
     <div class="card chart-card">
-      <h2>Rounds per Cipher</h2>
-      <canvas id="rndChart"></canvas>
+      <h2>Efficiency (Mbps per 1K cycles) <span class="note">higher = better</span></h2>
+      <canvas id="effChart"></canvas>
     </div>
   </section>
 
   <!-- FPGA Comparison -->
   <section class="charts-row">
     <div class="card chart-card wide">
-      <h2>📊 Throughput: ESP32 Software vs FPGA Hardware</h2>
-      <p class="note-text">FPGA values from Dahiphale et al. (2025), Virtex-5 platform. Software values from ESP32 simulation.</p>
+      <h2>📊 Throughput: ESP32 Software vs FPGA Virtex-5 Hardware</h2>
+      <p class="note-text">FPGA values from Dahiphale et al. (2025). Software values from live ESP32 simulation. FPGA is orders of magnitude faster due to dedicated hardware datapaths.</p>
       <canvas id="fpgaChart"></canvas>
     </div>
   </section>
 
-  <!-- Full Metrics Table -->
+  <!-- Metrics Table -->
   <section class="table-section">
     <div class="card">
-      <h2>📋 Complete Performance Metrics</h2>
+      <h2>📋 Complete Performance Metrics — All 4 Architectures</h2>
       <div class="table-wrap">
         <table id="metricsTable">
           <thead>
             <tr>
-              <th>Cipher</th><th>Block</th><th>Key</th><th>Rounds</th>
+              <th>Architecture</th><th>Datapath</th><th>Key</th><th>Rounds</th>
               <th>Enc (µs)</th><th>Dec (µs)</th><th>Throughput (Mbps)</th>
-              <th>Clock Cycles</th><th>Energy (nJ)</th><th>Ciphertext</th><th>Match</th>
+              <th>Clock Cycles</th><th>Energy (nJ)</th><th>Match</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="11" style="text-align:center;color:#888">Waiting for data...</td></tr>
+            <tr><td colspan="10" style="text-align:center;color:#888">Waiting for ESP32 data...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- FPGA Paper Reference Table -->
+  <!-- FPGA Reference Table -->
   <section class="table-section">
     <div class="card">
-      <h2>📄 FPGA Reference (Dahiphale et al. 2025, Virtex-5)</h2>
+      <h2>📄 FPGA Reference — Dahiphale et al. (2025), Virtex-5</h2>
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>Cipher</th><th>Architecture</th><th>Cycles</th><th>Throughput @Fmax</th><th>Total Power</th><th>Energy/block</th></tr>
+            <tr><th>Architecture</th><th>Cipher</th><th>Datapath</th><th>Cycles</th><th>Throughput @Fmax</th><th>Total Power</th><th>Energy/block</th></tr>
           </thead>
           <tbody>
-            <tr><td class="green">PRIDE (A1)</td><td>64-bit round-based</td><td>21</td><td class="green">1165.48 Mbps</td><td>579.46 mW</td><td>0.897 µJ</td></tr>
-            <tr><td>PRESENT (A2)</td><td>64-bit round-based</td><td>31</td><td>982.07 Mbps</td><td>581.06 mW</td><td>1.328 µJ</td></tr>
-            <tr><td>PRESENT (A3)</td><td>Iterative</td><td>55</td><td>316.12 Mbps</td><td>563.51 mW</td><td>2.285 µJ</td></tr>
+            <tr><td style="color:#00e676;font-weight:700">A1</td><td>PRIDE</td><td>64-bit round-based</td><td>21</td><td style="color:#00e676;font-weight:700">1165.48 Mbps</td><td>579.46 mW</td><td>0.897 µJ</td></tr>
+            <tr><td>A2</td><td>PRESENT</td><td>64-bit round-based</td><td>31</td><td>982.07 Mbps</td><td>581.06 mW</td><td>1.328 µJ</td></tr>
+            <tr><td>A3</td><td>PRESENT</td><td>32-bit iterative</td><td>55</td><td>316.12 Mbps</td><td>563.51 mW</td><td>2.285 µJ</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note-text">PRIDE outperforms PRESENT on all Virtex-5 metrics due to its efficient L0-L3 matrix linear layer requiring only 20 rounds.</p>
+      <p class="note-text" style="margin-top:12px">
+        PRIDE (A1) achieves <strong style="color:#00e676">18.7% higher throughput</strong> and
+        <strong style="color:#00e676">32.4% lower energy</strong> than PRESENT (A2) on FPGA,
+        due to its L0–L3 matrix linear layer enabling only 20 rounds vs PRESENT's 31.
+      </p>
     </div>
   </section>
 
@@ -139,9 +188,17 @@
 
 <footer>
   <p>Based on: V. Dahiphale et al., "Securing IoT devices with fast and energy efficient implementation of PRIDE and PRESENT ciphers," Cyber Security and Applications, Vol. 3, 2025</p>
-  <p>ESP32 Software Simulation on Wokwi · Dashboard auto-refreshes every 6 seconds</p>
+  <p>ESP32 Software Simulation · Wokwi Simulator @ 240 MHz · Dashboard auto-refreshes every 6 seconds</p>
 </footer>
 
 <script src="dashboard.js"></script>
+<script>
+  // Wire up relative metrics panel (second instance)
+  const origUpdate = updateRelative;
+  window.updateRelative = function(rel) {
+    origUpdate(rel);
+    document.getElementById('relSpeedup2').textContent = document.getElementById('relSpeedup').textContent;
+  }
+</script>
 </body>
 </html>
