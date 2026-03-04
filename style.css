@@ -4,7 +4,6 @@
   --bg:#0a0c12;--card:#13161f;--border:#1e2233;
   --accent:#00c8ff;--green:#00e676;--yellow:#ffd740;
   --red:#ff5252;--purple:#ce93d8;--text:#e0e0e0;--muted:#667;
-  --present:#00c8ff;--pride:#00e676;--aes:#ffd740;
 }
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 
@@ -12,7 +11,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 header{background:linear-gradient(135deg,#0d1117,#1a1f2e);border-bottom:1px solid var(--border);padding:20px 24px}
 .header-inner{max-width:1400px;margin:0 auto}
 h1{font-size:1.6rem;color:var(--accent);margin-bottom:4px}
-.subtitle{color:var(--muted);font-size:.85rem;margin-bottom:10px}
+.subtitle{color:var(--muted);font-size:.85rem;margin-bottom:8px}
+.legend-row{display:flex;gap:18px;margin:6px 0 10px;font-size:.82rem;flex-wrap:wrap}
+.leg{font-weight:600}
 .status-bar{display:flex;align-items:center;gap:10px;font-size:.82rem}
 .dot{width:9px;height:9px;border-radius:50%;background:#444;transition:background .3s}
 .dot.live{background:var(--green);animation:pulse 1.5s infinite}
@@ -23,18 +24,24 @@ h1{font-size:1.6rem;color:var(--accent);margin-bottom:4px}
 /* ── Main ────────────────────────────────────────────────── */
 main{max-width:1400px;margin:0 auto;padding:20px 16px}
 
+/* ── Insight banner ──────────────────────────────────────── */
+.insight-banner{margin-bottom:16px}
+.insight-box{background:#0d1a0d;border:1px solid #00e67640;border-radius:10px;padding:14px 18px;font-size:.84rem;line-height:1.6;color:#ccc;display:flex;gap:12px;align-items:flex-start}
+.insight-icon{font-size:1.2rem;margin-top:1px;flex-shrink:0}
+
 /* ── Cards ───────────────────────────────────────────────── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
-.card h2{font-size:.95rem;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h2{font-size:.95rem;color:var(--accent);margin-bottom:14px}
 .note{font-size:.72rem;color:var(--muted);font-weight:400}
-.note-text{font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.note-text{font-size:.78rem;color:var(--muted);line-height:1.5}
 .card-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
 .big-val{font-size:2.6rem;font-weight:700;line-height:1}
 .big-unit{font-size:.8rem;color:var(--muted);margin-top:4px}
 .sub-val{font-size:.82rem;color:var(--muted);margin-top:8px}
-.cipher-name{color:var(--accent)}
 .green{color:var(--green)}
+.cyan{color:var(--accent)}
 .yellow{color:var(--yellow)}
+.hex{font-family:monospace;font-size:.75rem;color:var(--yellow);word-break:break-all}
 
 /* ── Top cards grid ─────────────────────────────────────── */
 .top-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px}
@@ -45,6 +52,13 @@ main{max-width:1400px;margin:0 auto;padding:20px 16px}
 .chart-card.wide{grid-column:1/-1}
 canvas{max-height:220px}
 
+/* ── Relative metrics grid ───────────────────────────────── */
+.rel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-top:8px}
+.rel-box{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.rel-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.rel-val{font-size:1.9rem;font-weight:700;line-height:1}
+.rel-desc{font-size:.68rem;color:var(--muted);margin-top:5px;line-height:1.4}
+
 /* ── Table ───────────────────────────────────────────────── */
 .table-section{margin-bottom:16px}
 .table-wrap{overflow-x:auto}
@@ -53,25 +67,8 @@ th{text-align:left;padding:9px 10px;background:#1a1d2e;color:var(--accent);font-
 td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
 tr:last-child td{border-bottom:none}
 tr:nth-child(even) td{background:rgba(255,255,255,.02)}
-td.green{color:var(--green);font-weight:700}
 .match-yes{color:var(--green);font-weight:700}
 .match-no{color:var(--red)}
-.hex{font-family:monospace;font-size:.75rem;color:var(--yellow)}
 
 /* ── Footer ──────────────────────────────────────────────── */
 footer{text-align:center;color:var(--muted);font-size:.72rem;padding:24px 16px;border-top:1px solid var(--border);line-height:1.8;margin-top:8px}
-
-/* ── Relative metrics grid ───────────────────────────────── */
-.rel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:8px}
-.rel-box{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
-.rel-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-.rel-val{font-size:2rem;font-weight:700;line-height:1}
-.rel-val.green{color:var(--green)}
-.rel-val.yellow{color:var(--yellow)}
-.rel-val.cyan{color:var(--accent)}
-.rel-desc{font-size:.7rem;color:var(--muted);margin-top:5px;line-height:1.4}
-.rel-winner{font-weight:700}
-.legend-row{display:flex;gap:18px;margin:6px 0 10px;font-size:.82rem}
-.leg{font-weight:600}
-.hex{font-family:monospace;font-size:.75rem;color:var(--yellow);word-break:break-all}
-.cyan{color:var(--accent)}
