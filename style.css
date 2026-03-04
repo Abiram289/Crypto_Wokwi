@@ -1,0 +1,62 @@
+/* ── Reset & Base ────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c12;--card:#13161f;--border:#1e2233;
+  --accent:#00c8ff;--green:#00e676;--yellow:#ffd740;
+  --red:#ff5252;--purple:#ce93d8;--text:#e0e0e0;--muted:#667;
+  --present:#00c8ff;--pride:#00e676;--aes:#ffd740;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+/* ── Header ─────────────────────────────────────────────── */
+header{background:linear-gradient(135deg,#0d1117,#1a1f2e);border-bottom:1px solid var(--border);padding:20px 24px}
+.header-inner{max-width:1400px;margin:0 auto}
+h1{font-size:1.6rem;color:var(--accent);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:.85rem;margin-bottom:10px}
+.status-bar{display:flex;align-items:center;gap:10px;font-size:.82rem}
+.dot{width:9px;height:9px;border-radius:50%;background:#444;transition:background .3s}
+.dot.live{background:var(--green);animation:pulse 1.5s infinite}
+.dot.error{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.last-update{color:var(--muted);margin-left:auto}
+
+/* ── Main ────────────────────────────────────────────────── */
+main{max-width:1400px;margin:0 auto;padding:20px 16px}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card h2{font-size:.95rem;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.note{font-size:.72rem;color:var(--muted);font-weight:400}
+.note-text{font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.card-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.big-val{font-size:2.6rem;font-weight:700;line-height:1}
+.big-unit{font-size:.8rem;color:var(--muted);margin-top:4px}
+.sub-val{font-size:.82rem;color:var(--muted);margin-top:8px}
+.cipher-name{color:var(--accent)}
+.green{color:var(--green)}
+.yellow{color:var(--yellow)}
+
+/* ── Top cards grid ─────────────────────────────────────── */
+.top-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:16px}
+
+/* ── Chart rows ──────────────────────────────────────────── */
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px;margin-bottom:16px}
+.chart-card{min-height:280px}
+.chart-card.wide{grid-column:1/-1}
+canvas{max-height:220px}
+
+/* ── Table ───────────────────────────────────────────────── */
+.table-section{margin-bottom:16px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:9px 10px;background:#1a1d2e;color:var(--accent);font-weight:600;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+td.green{color:var(--green);font-weight:700}
+.match-yes{color:var(--green);font-weight:700}
+.match-no{color:var(--red)}
+.hex{font-family:monospace;font-size:.75rem;color:var(--yellow)}
+
+/* ── Footer ──────────────────────────────────────────────── */
+footer{text-align:center;color:var(--muted);font-size:.72rem;padding:24px 16px;border-top:1px solid var(--border);line-height:1.8;margin-top:8px}

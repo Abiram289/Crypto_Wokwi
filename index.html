@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IoT Cipher Benchmark Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>⚡ IoT Cipher Benchmark Dashboard</h1>
+    <p class="subtitle">PRESENT-80 · PRIDE · AES-128 on ESP32 · Based on Dahiphale et al. (2025)</p>
+    <div class="status-bar">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Connecting...</span>
+      <span class="last-update" id="lastUpdate"></span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Sensor + Active Cipher -->
+  <section class="top-cards">
+    <div class="card sensor-card">
+      <div class="card-label">🌡 Live Sensor</div>
+      <div class="big-val" id="tempVal">--.-</div>
+      <div class="big-unit">°C Temperature</div>
+      <div class="sub-val" id="humVal">-- %RH</div>
+    </div>
+    <div class="card cipher-card">
+      <div class="card-label">🔐 Active Cipher</div>
+      <div class="big-val cipher-name" id="activeCipher">---</div>
+      <div class="sub-val" id="activeCT" style="font-family:monospace;font-size:.8rem;word-break:break-all"></div>
+      <div class="sub-val" id="liveEncTime"></div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-label">⏱ Fastest Cipher</div>
+      <div class="big-val green" id="fastestName">---</div>
+      <div class="sub-val" id="fastestTime"></div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-label">📡 Transfer Time</div>
+      <div class="big-val yellow" id="transferTime">-- ms</div>
+      <div class="sub-val">ESP32 → Server</div>
+    </div>
+  </section>
+
+  <!-- Enc / Dec Time Bar Charts -->
+  <section class="charts-row">
+    <div class="card chart-card">
+      <h2>Encryption Time (µs) <span class="note">lower = faster</span></h2>
+      <canvas id="encChart"></canvas>
+    </div>
+    <div class="card chart-card">
+      <h2>Decryption Time (µs) <span class="note">lower = faster</span></h2>
+      <canvas id="decChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Throughput + Clock Cycles -->
+  <section class="charts-row">
+    <div class="card chart-card">
+      <h2>Throughput (Mbps) <span class="note">higher = faster</span></h2>
+      <canvas id="thrChart"></canvas>
+    </div>
+    <div class="card chart-card">
+      <h2>Clock Cycles per Encryption</h2>
+      <canvas id="cycChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Energy + Enc-per-bit -->
+  <section class="charts-row">
+    <div class="card chart-card">
+      <h2>Energy per Block (nJ) <span class="note">lower = better</span></h2>
+      <canvas id="eneChart"></canvas>
+    </div>
+    <div class="card chart-card">
+      <h2>Rounds per Cipher</h2>
+      <canvas id="rndChart"></canvas>
+    </div>
+  </section>
+
+  <!-- FPGA Comparison -->
+  <section class="charts-row">
+    <div class="card chart-card wide">
+      <h2>📊 Throughput: ESP32 Software vs FPGA Hardware</h2>
+      <p class="note-text">FPGA values from Dahiphale et al. (2025), Virtex-5 platform. Software values from ESP32 simulation.</p>
+      <canvas id="fpgaChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Full Metrics Table -->
+  <section class="table-section">
+    <div class="card">
+      <h2>📋 Complete Performance Metrics</h2>
+      <div class="table-wrap">
+        <table id="metricsTable">
+          <thead>
+            <tr>
+              <th>Cipher</th><th>Block</th><th>Key</th><th>Rounds</th>
+              <th>Enc (µs)</th><th>Dec (µs)</th><th>Throughput (Mbps)</th>
+              <th>Clock Cycles</th><th>Energy (nJ)</th><th>Ciphertext</th><th>Match</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="11" style="text-align:center;color:#888">Waiting for data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FPGA Paper Reference Table -->
+  <section class="table-section">
+    <div class="card">
+      <h2>📄 FPGA Reference (Dahiphale et al. 2025, Virtex-5)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Cipher</th><th>Architecture</th><th>Cycles</th><th>Throughput @Fmax</th><th>Total Power</th><th>Energy/block</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="green">PRIDE (A1)</td><td>64-bit round-based</td><td>21</td><td class="green">1165.48 Mbps</td><td>579.46 mW</td><td>0.897 µJ</td></tr>
+            <tr><td>PRESENT (A2)</td><td>64-bit round-based</td><td>31</td><td>982.07 Mbps</td><td>581.06 mW</td><td>1.328 µJ</td></tr>
+            <tr><td>PRESENT (A3)</td><td>Iterative</td><td>55</td><td>316.12 Mbps</td><td>563.51 mW</td><td>2.285 µJ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note-text">PRIDE outperforms PRESENT on all Virtex-5 metrics due to its efficient L0-L3 matrix linear layer requiring only 20 rounds.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Based on: V. Dahiphale et al., "Securing IoT devices with fast and energy efficient implementation of PRIDE and PRESENT ciphers," Cyber Security and Applications, Vol. 3, 2025</p>
+  <p>ESP32 Software Simulation on Wokwi · Dashboard auto-refreshes every 6 seconds</p>
+</footer>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
